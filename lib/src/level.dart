@@ -4,6 +4,8 @@
 
 // ignore_for_file: constant_identifier_names
 
+import 'package:flutter/foundation.dart';
+
 /// [Level]s to control logging output. Logging can be enabled to include all
 /// levels above certain [Level]. [Level]s are ordered using an integer
 /// value [Level.value]. The predefined [Level] constants below are sorted as
@@ -14,6 +16,7 @@
 /// We recommend using one of the predefined logging levels. If you define your
 /// own level, make sure you use a value between those used in [Level.ALL] and
 /// [Level.OFF].
+@immutable
 class Level implements Comparable<Level> {
   final String name;
 

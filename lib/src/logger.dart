@@ -30,8 +30,7 @@ class Logger {
   final String name;
 
   /// The full name of this logger, which includes the parent's full name.
-  String get fullName =>
-      parent?.name.isNotEmpty ?? false ? '${parent!.fullName}.$name' : name;
+  String get fullName => parent?.name.isNotEmpty ?? false ? '${parent!.fullName}.$name' : name;
 
   /// Parent of this logger in the hierarchy of loggers.
   final Logger? parent;
@@ -60,8 +59,7 @@ class Logger {
   /// Calling `Logger(name)` will return the same instance whenever it is called
   /// with the same string name. Loggers created with this constructor are
   /// retained indefinitely and available through [attachedLoggers].
-  factory Logger(String name) =>
-      _loggers.putIfAbsent(name, () => Logger._named(name));
+  factory Logger(String name) => _loggers.putIfAbsent(name, () => Logger._named(name));
 
   /// Creates a new detached [Logger].
   ///
@@ -71,15 +69,14 @@ class Logger {
   ///
   /// It can be useful when you just need a local short-living logger,
   /// which you'd like to be garbage-collected later.
-  factory Logger.detached(String name) =>
-      Logger._internal(name, null, <String, Logger>{});
+  factory Logger.detached(String name) => Logger._internal(name, null, <String, Logger>{});
 
   factory Logger._named(String name) {
     if (name.startsWith('.')) {
       throw ArgumentError("name shouldn't start with a '.'");
     }
     // Split hierarchical names (separated with '.').
-    var dot = name.lastIndexOf('.');
+    final dot = name.lastIndexOf('.');
     Logger? parent;
     String thisName;
     if (dot == -1) {
@@ -127,13 +124,11 @@ class Logger {
   /// Setting this to `null` makes it inherit the [parent]s level.
   set level(Level? value) {
     if (!hierarchicalLoggingEnabled && parent != null) {
-      throw UnsupportedError(
-          'Please set "hierarchicalLoggingEnabled" to true if you want to '
+      throw UnsupportedError('Please set "hierarchicalLoggingEnabled" to true if you want to '
           'change the level on a non-root logger.');
     }
     if (parent == null && value == null) {
-      throw UnsupportedError(
-          'Cannot set the level to `null` on a logger with no parent.');
+      throw UnsupportedError('Cannot set the level to `null` on a logger with no parent.');
     }
     _level = value;
   }
@@ -157,7 +152,7 @@ class Logger {
   }
 
   /// Whether a message for [value]'s level is loggable in this logger.
-  bool isLoggable(Level value) => (value >= level);
+  bool isLoggable(Level value) => value >= level;
 
   /// Adds a log record for a [message] at a particular [logLevel] if
   /// `isLoggable(logLevel)` is true.
@@ -176,8 +171,14 @@ class Logger {
   /// was made. This can be advantageous if a log listener wants to handler
   /// records of different zones differently (e.g. group log records by HTTP
   /// request if each HTTP request handler runs in it's own zone).
-  void log(Level logLevel, Object? message,
-      [Object? error, StackTrace? stackTrace, Zone? zone]) {
+  void log(
+    Level logLevel,
+    Object? message, {
+    Object? error,
+    StackTrace? stackTrace,
+    Zone? zone,
+    Object? attributes,
+  }) {
     Object? object;
     if (isLoggable(logLevel)) {
       if (message is Function) {
@@ -198,8 +199,7 @@ class Logger {
       }
       zone ??= Zone.current;
 
-      var record =
-          LogRecord(logLevel, msg, fullName, error, stackTrace, zone, object);
+      final record = LogRecord(logLevel, msg, fullName, error, stackTrace, zone, object, attributes);
 
       if (parent == null) {
         _publish(record);
@@ -219,62 +219,61 @@ class Logger {
   ///
   /// See [log] for information on how non-String [message] arguments are
   /// handled.
-  void finest(Object? message, [Object? error, StackTrace? stackTrace]) =>
-      log(Level.FINEST, message, error, stackTrace);
+  void finest(Object? message, {Object? error, StackTrace? stackTrace, Object? attributes}) =>
+      log(Level.FINEST, message, error: error, stackTrace: stackTrace, attributes: attributes);
 
   /// Log message at level [Level.FINER].
   ///
   /// See [log] for information on how non-String [message] arguments are
   /// handled.
-  void finer(Object? message, [Object? error, StackTrace? stackTrace]) =>
-      log(Level.FINER, message, error, stackTrace);
+  void finer(Object? message, {Object? error, StackTrace? stackTrace, Object? attributes}) =>
+      log(Level.FINER, message, error: error, stackTrace: stackTrace, attributes: attributes);
 
   /// Log message at level [Level.FINE].
   ///
   /// See [log] for information on how non-String [message] arguments are
   /// handled.
-  void fine(Object? message, [Object? error, StackTrace? stackTrace]) =>
-      log(Level.FINE, message, error, stackTrace);
+  void fine(Object? message, {Object? error, StackTrace? stackTrace, Object? attributes}) =>
+      log(Level.FINE, message, error: error, stackTrace: stackTrace, attributes: attributes);
 
   /// Log message at level [Level.CONFIG].
   ///
   /// See [log] for information on how non-String [message] arguments are
   /// handled.
-  void config(Object? message, [Object? error, StackTrace? stackTrace]) =>
-      log(Level.CONFIG, message, error, stackTrace);
+  void config(Object? message, {Object? error, StackTrace? stackTrace, Object? attributes}) =>
+      log(Level.CONFIG, message, error: error, stackTrace: stackTrace, attributes: attributes);
 
   /// Log message at level [Level.INFO].
   ///
   /// See [log] for information on how non-String [message] arguments are
   /// handled.
-  void info(Object? message, [Object? error, StackTrace? stackTrace]) =>
-      log(Level.INFO, message, error, stackTrace);
+  void info(Object? message, {Object? error, StackTrace? stackTrace, Object? attributes}) =>
+      log(Level.INFO, message, error: error, stackTrace: stackTrace, attributes: attributes);
 
   /// Log message at level [Level.WARNING].
   ///
   /// See [log] for information on how non-String [message] arguments are
   /// handled.
-  void warning(Object? message, [Object? error, StackTrace? stackTrace]) =>
-      log(Level.WARNING, message, error, stackTrace);
+  void warning(Object? message, {Object? error, StackTrace? stackTrace, Object? attributes}) =>
+      log(Level.WARNING, message, error: error, stackTrace: stackTrace, attributes: attributes);
 
   /// Log message at level [Level.SEVERE].
   ///
   /// See [log] for information on how non-String [message] arguments are
   /// handled.
-  void severe(Object? message, [Object? error, StackTrace? stackTrace]) =>
-      log(Level.SEVERE, message, error, stackTrace);
+  void severe(Object? message, {Object? error, StackTrace? stackTrace, Object? attributes}) =>
+      log(Level.SEVERE, message, error: error, stackTrace: stackTrace, attributes: attributes);
 
   /// Log message at level [Level.SHOUT].
   ///
   /// See [log] for information on how non-String [message] arguments are
   /// handled.
-  void shout(Object? message, [Object? error, StackTrace? stackTrace]) =>
-      log(Level.SHOUT, message, error, stackTrace);
+  void shout(Object? message, {Object? error, StackTrace? stackTrace, Object? attributes}) =>
+      log(Level.SHOUT, message, error: error, stackTrace: stackTrace, attributes: attributes);
 
   Stream<LogRecord> _getStream() {
     if (hierarchicalLoggingEnabled || parent == null) {
-      return (_controller ??= StreamController<LogRecord>.broadcast(sync: true))
-          .stream;
+      return (_controller ??= StreamController<LogRecord>.broadcast(sync: true)).stream;
     } else {
       return root._getStream();
     }

@@ -36,9 +36,19 @@ class LogRecord {
   /// Zone of the calling code which resulted in this LogRecord.
   final Zone? zone;
 
-  LogRecord(this.level, this.message, this.loggerName,
-      [this.error, this.stackTrace, this.zone, this.object])
-      : time = DateTime.now(),
+  /// Log attributes passed to Logger
+  final Object? attributes;
+
+  LogRecord(
+    this.level,
+    this.message,
+    this.loggerName, [
+    this.error,
+    this.stackTrace,
+    this.zone,
+    this.object,
+    this.attributes,
+  ])  : time = DateTime.now(),
         sequenceNumber = LogRecord._nextNumber++;
 
   @override
